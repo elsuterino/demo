@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+function bash {
+    docker-compose run -it demo-app /bin/bash
+}
+
+TIMEFORMAT=$'\nTask completed in %3lR'
+time "${@}"

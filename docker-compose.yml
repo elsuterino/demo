@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  demo-app:
+    build:
+      context: ./.docker/php
+      dockerfile: Dockerfile
+      args:
+        USER_ID: '1000'
+        GROUP_ID: '1001'
+    image: demo-app
+    volumes:
+      - '.:/var/www/html'
+    networks:
+      - demo
+
+  worker:
+    image: demo-app
+    volumes:
+      - '.:/var/www/html'
+    ports:
+      - '${FORWARD_WEB_PORT:-8000}:8000'
+    command: 'php -d variables_order=EGPCS /var/www/html/artisan serve'
+    depends_on:
+        - pgsql
+    networks:
+      - demo
+
+  pgsql:
+    image: postgres:15
+    ports:
+      - '${FORWARD_PGSQL_PORT:-5432}:5432'
+    environment:
+      POSTGRES_PASSWORD: job_board
+    volumes:
+      - ./.docker/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - demo
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  demo:
+    driver: bridge
