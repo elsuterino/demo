@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTinyUrlRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class StoreTinyUrlRequest extends FormRequest
     {
         return [
             'url' => ['required', 'string', 'url'],
-            'slug' => ['nullable', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('tiny_urls', 'slug')],
             'expires_at' => ['nullable', 'date'],
         ];
     }
