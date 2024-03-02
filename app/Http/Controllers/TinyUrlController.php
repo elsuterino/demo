@@ -15,7 +15,7 @@ class TinyUrlController extends Controller
         $url = new TinyUrl();
 
         $url->url = $request->input('url');
-        $url->slug = $request->input('slug', Str::ulid());
+        $url->slug = $request->input('slug') ?: Str::ulid();
         $url->expires_at = $request->date('expires_at') ?: now()->addMonth();
 
         $url->save();
